@@ -8,17 +8,22 @@ public class PresupuestoDetalle
 
     
     public int Cantidad { get => cantidad; set => cantidad = value; }
+    public Producto Producto { get => producto; set => producto = value; }
 
     public void AsignarProducto(int id)
     {
         var repositorioProductos = new ProductoRepository();
-        producto = repositorioProductos.ObtenerProducto(id);
+        Producto = repositorioProductos.ObtenerProducto(id);
         
     }
 
-    public Producto obtenerProducto()
+    public Producto ObtenerProducto()
     {
-        return producto;
+        return Producto;
     }
     
+    public int ObtenerIdProducto()
+    {
+        return Producto.IdProducto;
+    }
 }   

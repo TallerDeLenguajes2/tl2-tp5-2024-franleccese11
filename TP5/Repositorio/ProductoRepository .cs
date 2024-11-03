@@ -20,10 +20,12 @@ namespace TP5.Repositorio
             {
                 using (SqliteConnection connection = new(connectionString))
                 {
+                    connection.Open();
                     string queryStr = @"SELECT COUNT(*) FROM Productos WHERE idProducto = @id";
                     SqliteCommand command = new(queryStr,connection);
                     command.Parameters.AddWithValue("@id",id);
                     int count = Convert.ToInt32(command.ExecuteScalar());
+                    connection.Close();
                     return count>0;
                 }
             }
@@ -46,12 +48,15 @@ namespace TP5.Repositorio
                 {
                     while (reader.Read())
                     {
-                        var producto = new Producto
-                        {
-                            IdProducto = Convert.ToInt32(reader["idProducto"]),
-                            Descripcion = reader["Descripcion"].ToString(),
-                            Precio = Convert.ToInt32(reader["precio"])
-                        };
+                        var producto = new Producto();
+                        producto.SetID(Convert.ToInt32(reader["idProducto"]));
+                        producto.Descripcion = reader["Descripcion"].ToString();
+                        producto.Precio = Convert.ToInt32(reader["precio"]);
+                        // {
+                        //     IdProducto = producto.SetID(Convert.ToInt32(reader["idProducto"])) ,
+                        //     Descripcion = reader["Descripcion"].ToString(),
+                        //     Precio = Convert.ToInt32(reader["precio"])
+                        // };
                         listaProductos.Add(producto);
                     }
                 }
@@ -123,7 +128,7 @@ namespace TP5.Repositorio
                         if (reader.Read())
                         {
                             Producto producto = new();
-                            producto.IdProducto = id;
+                            producto.SetID(id);
                             producto.Descripcion = reader["Descripcion"].ToString();
                             producto.Precio = Convert.ToInt32(reader["Precio"]);
                             connection.Close();

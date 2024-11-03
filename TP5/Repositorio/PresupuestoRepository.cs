@@ -22,7 +22,8 @@ namespace TP5.Repositorio
                     string queryStr= @" INSERT INTO Presupuestos (NombreDestinatario, FechaCreacion) VALUES (@NombreDestinatario,@FechaCreacion)";
                     SqliteCommand command = new(queryStr,connection);
                     command.Parameters.AddWithValue("@NombreDestinatario",presupuesto.NombreDestinatario);
-                    command.Parameters.AddWithValue("@FechaCreacion",presupuesto.Fecha);
+                     DateTime fechaSinHora = new DateTime(presupuesto.Fecha.Year, presupuesto.Fecha.Month, presupuesto.Fecha.Day);
+                    command.Parameters.AddWithValue("@FechaCreacion",fechaSinHora);
                     command.ExecuteNonQuery();
                     connection.Close();
                 }
@@ -47,13 +48,15 @@ namespace TP5.Repositorio
                     SqliteCommand command = new(queryStr,connection);
                     using (SqliteDataReader reader = command.ExecuteReader())
                     {
-                        Presupuesto presupuesto = new()
+                        while (reader.Read())
                         {
-                            IdPresupuesto = Convert.ToInt32(reader["idPresupuesto"]),
-                            Fecha = (DateTime)reader["FechaCreacion"],
-                            NombreDestinatario = reader["NombreDestinatario"].ToString()
-                        };
-                        listaPresupuestos.Add(presupuesto);
+                           Presupuesto presupuesto = new();
+                            presupuesto.SetID(Convert.ToInt32(reader["idPresupuesto"]));
+                           presupuesto.Fecha = DateTime.Parse(reader["FechaCreacion"].ToString());
+                            presupuesto.NombreDestinatario = reader["NombreDestinatario"].ToString();
+                            listaPresupuestos.Add(presupuesto); 
+                        }
+                        
                     }
                     connection.Close();
                     return listaPresupuestos;
@@ -97,6 +100,29 @@ namespace TP5.Repositorio
             {
                 
                 throw new Exception("Error en la conexion con la Base de datos",ex);
+            }
+        }
+
+        public void AgregarDetalle(PresupuestoDetalle detalle,int idPresupuesto)
+        {
+            try
+            {
+                using (SqliteConnection connection = new(connectionString))
+                {
+                    connection.Open();
+                    string queryStr = "INSERT INTO PresupuestoDetalle VALUES (@idPresupuesto,@idProducto,@Cantidad)";
+                    SqliteCommand command = new(queryStr,connection);
+                    command.Parameters.AddWithValue("@idProducto",detalle.ObtenerIdProducto());
+                    command.Parameters.AddWithValue("@idPresupuesto",idPresupuesto);
+                    command.Parameters.AddWithValue("@cantidad",detalle.Cantidad);
+                    command.ExecuteNonQuery();
+                    connection.Close();
+                }
+            }
+            catch (System.Exception)
+            {
+                
+                throw;
             }
         }
 

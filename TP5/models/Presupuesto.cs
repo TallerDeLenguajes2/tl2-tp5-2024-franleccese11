@@ -10,11 +10,16 @@ public class Presupuesto
     private List <PresupuestoDetalle> listaDetalle;
 
     private DateTime fecha;
-    public int IdPresupuesto { get => idPresupuesto; set => idPresupuesto = value; }
+    public int IdPresupuesto { get => idPresupuesto;}
     public string NombreDestinatario { get => nombreDestinatario; set => nombreDestinatario = value; }
-    public DateTime Fecha { get => fecha; set => fecha = value; }
+    public DateTime Fecha { get => fecha; set => fecha = value.Date; }
 
-    public void agregarDetalle(PresupuestoDetalle detalle)
+    public void SetID(int id)
+    {
+        idPresupuesto = id;
+    }
+
+    public void AgregarDetalle(PresupuestoDetalle detalle)
     {
         listaDetalle.Add(detalle);
     }
@@ -30,7 +35,7 @@ public class Presupuesto
 
         foreach (PresupuestoDetalle item in listaDetalle)
         {   
-            monto = monto + item.Cantidad * item.obtenerProducto().Precio;
+            monto = monto + item.Cantidad * item.ObtenerProducto().Precio;
         }
         return monto;
     }
@@ -51,6 +56,7 @@ public class Presupuesto
         }
         return cant;
     }
+
 
     
     
